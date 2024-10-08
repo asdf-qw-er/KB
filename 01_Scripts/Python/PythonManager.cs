@@ -22,7 +22,6 @@ public class PythonManager : MonoBehaviour
 
     void OnApplicationQuit() { KillProcess(); }
 
-
     #region Public
     public void Run(string scriptName)
     {
@@ -55,21 +54,6 @@ public class PythonManager : MonoBehaviour
                 case "TTS.py":
                     TTS = Process.Start(start);
                     break;
-            }
-        }
-        catch (Exception) { }
-    }
-
-    public void GetTTS(string temp)
-    {
-        try
-        {
-            if (TTS != null && !TTS.HasExited)
-                TTS.StandardInput.WriteLine(temp);
-            else
-            {
-                Run("TTS.py");
-                TTS.StandardInput.WriteLine(temp);
             }
         }
         catch (Exception) { }

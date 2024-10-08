@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public class EventSTT : MonoBehaviour
 {
     [SerializeField] private Server m_Server;
+    // Length of m_Button must be same as Length of m_STT
     [SerializeField] private Button[] m_Button;
+    [SerializeField] private string[] m_STT;
 
     #region Life Cycle
     void Update()
@@ -22,19 +24,19 @@ public class EventSTT : MonoBehaviour
         Debug.Log("Method <OnSTTChanged>: " + m_Server.STT);
 
         int buttonIdx = -1;
-        switch (m_Server.STT.Replace(" ", ""))
+
+        string processedSTT = m_Server.STT.Replace(" ", "");
+        for (int i = 0; i < m_Button.Length; i++)
         {
-            case "예금출금":
-            case "출근":
-            case "출금":
-            case "예금":
-                buttonIdx = 0; break;
-            case "입금":
-                buttonIdx = 1; break;
-            case "계좌송금":
-            case "송금":
-            case "계좌":
-                buttonIdx = 2; break;
+            string[] keywords = m_STT[i].Split(";");
+            foreach (string keyword in keywords)
+            {
+                if (processedSTT == keyword)
+                {
+                    buttonIdx = i;
+                    break;
+                }
+            }
         }
 
         if (buttonIdx != -1)
