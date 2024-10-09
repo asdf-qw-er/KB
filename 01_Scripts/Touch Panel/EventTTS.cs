@@ -10,7 +10,7 @@ public class EventTTS : MonoBehaviour
     #region Life Cycle
     void Start()
     {
-        if (isOnlyTTS)
+        if (!isOnlyTTS)
             gameObject.transform.GetComponent<Button>().onClick.AddListener(() => { GetTTS(gameObject.transform.GetChild(0).GetComponent<Text>().text.Replace(" ", "")); });
     }
     #endregion
