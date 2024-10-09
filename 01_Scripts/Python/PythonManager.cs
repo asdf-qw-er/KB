@@ -45,7 +45,7 @@ public class PythonManager : MonoBehaviour
                 case "ED.py":
                     EmotionDetection = Process.Start(start);
                     break;
-                case "ObjectDetectionByCam.py":
+                case "OD.py":
                     ObjectDetection = Process.Start(start);
                     break;
                 case "STT.py":

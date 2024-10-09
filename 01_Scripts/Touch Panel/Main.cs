@@ -21,7 +21,7 @@ public class Main : MonoBehaviour
     private void RunOD()
     {
         try { m_PythonManager.EmotionDetection.Kill(); } catch (Exception) { }
-        //m_PythonManager.Run("OD.py");
+        m_PythonManager.Run("OD.py");
     }
     #endregion
 }

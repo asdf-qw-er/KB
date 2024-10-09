@@ -17,7 +17,94 @@ public class Server : MonoBehaviour
     #endregion
 
     #region Emotion
-    public int Emotion;
+    public byte Emotion;
+    #endregion
+
+    #region Object
+    public byte[] Object;
+    public enum ObjectCategory
+    {
+        Person,               // 0
+        Bicycle,              // 1
+        Car,                  // 2
+        Motorcycle,           // 3
+        Airplane,             // 4
+        Bus,                  // 5
+        Train,                // 6
+        Truck,                // 7
+        Boat,                 // 8
+        TrafficLight,         // 9
+        FireHydrant,          // 10
+        StopSign,             // 11
+        ParkingMeter,         // 12
+        Bench,                // 13
+        Bird,                 // 14
+        Cat,                  // 15
+        Dog,                  // 16
+        Horse,                // 17
+        Sheep,                // 18
+        Cow,                  // 19
+        Elephant,             // 20
+        Bear,                 // 21
+        Zebra,                // 22
+        Giraffe,              // 23
+        Backpack,             // 24
+        Umbrella,             // 25
+        Handbag,              // 26
+        Tie,                  // 27
+        Suitcase,             // 28
+        Frisbee,              // 29
+        Skis,                 // 30
+        Snowboard,            // 31
+        SportsBall,           // 32
+        Kite,                 // 33
+        BaseballBat,          // 34
+        BaseballGlove,        // 35
+        Skateboard,           // 36
+        Surfboard,            // 37
+        TennisRacket,         // 38
+        Bottle,               // 39
+        WineGlass,            // 40
+        Cup,                  // 41
+        Fork,                 // 42
+        Knife,                // 43
+        Spoon,                // 44
+        Bowl,                 // 45
+        Banana,               // 46
+        Apple,                // 47
+        Sandwich,             // 48
+        Orange,               // 49
+        Broccoli,             // 50
+        Carrot,               // 51
+        HotDog,               // 52
+        Pizza,                // 53
+        Donut,                // 54
+        Cake,                 // 55
+        Chair,                // 56
+        Couch,                // 57
+        PottedPlant,          // 58
+        Bed,                  // 59
+        DiningTable,          // 60
+        Toilet,               // 61
+        TV,                   // 62
+        Laptop,               // 63
+        Mouse,                // 64
+        Remote,               // 65
+        Keyboard,             // 66
+        CellPhone,            // 67
+        Microwave,            // 68
+        Oven,                 // 69
+        Toaster,              // 70
+        Sink,                 // 71
+        Refrigerator,         // 72
+        Book,                 // 73
+        Clock,                // 74
+        Vase,                 // 75
+        Scissors,             // 76
+        TeddyBear,            // 77
+        HairDrier,            // 78
+        Toothbrush            // 79
+    }
     #endregion
 
     #region Life Cycle
@@ -94,7 +181,7 @@ public class Server : MonoBehaviour
         // PID(01) : STT
         if (ID == 0x02 && PID == 0x01)
         {
-            try 
+            try
             {
                 STT = Encoding.UTF8.GetString(messageBytes);
                 isChangedSTT = true;
@@ -104,11 +191,21 @@ public class Server : MonoBehaviour
             catch (Exception) { }
         }
         // PID(02) : Emotion Detection
-        else if (ID==0x02 && PID == 0x02)
+        else if (ID == 0x02 && PID == 0x02)
         {
             Emotion = messageBytes[0];
 
             //Debug.Log("Emotion received: " + Emotion);
+        }
+        // PID(03) : Object Detection
+        else if (ID == 0x02 && PID == 0x03)
+        {
+            Object = messageBytes;
+
+            //string sObject = string.Empty;
+            //for (int i = 0; i < Object.Length; i++)
+            //    sObject += (ObjectCategory)Object[i] + " ";
+            //Debug.Log("Object received: " + sObject);
         }
 
         //byte receivedChecksum = packet[4 + messageLength];

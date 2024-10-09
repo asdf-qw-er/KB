@@ -20,7 +20,8 @@ public class EventED : MonoBehaviour
     #region Private
     private void GetNegativeEmotion()
     {
-        if (!isPopupActivated && (m_Server.Emotion == 0 || m_Server.Emotion == 1 || m_Server.Emotion == 2 || m_Server.Emotion == 4))
+        if (!isPopupActivated &&
+            (m_Server.Emotion == 0x00 || m_Server.Emotion == 0x01 || m_Server.Emotion == 0x02 || m_Server.Emotion == 0x04))
         {
             m_Time += Time.deltaTime;
             if (m_Time >= 60)
