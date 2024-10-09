@@ -42,7 +42,7 @@ public class PythonManager : MonoBehaviour
         {
             switch (scriptName)
             {
-                case "EmotionDetectionByCam.py":
+                case "ED.py":
                     EmotionDetection = Process.Start(start);
                     break;
                 case "ObjectDetectionByCam.py":

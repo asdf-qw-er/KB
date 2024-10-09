@@ -16,6 +16,10 @@ public class Server : MonoBehaviour
     public bool isChangedSTT;
     #endregion
 
+    #region Emotion
+    public int Emotion;
+    #endregion
+
     #region Life Cycle
     void Start() { StartServer(); }
 
@@ -84,18 +88,27 @@ public class Server : MonoBehaviour
         if (length < 4 + messageLength + 1)
             return;
 
+        byte[] messageBytes = new byte[messageLength];
+        Array.Copy(packet, 4, messageBytes, 0, messageLength);
+
         // PID(01) : STT
         if (ID == 0x02 && PID == 0x01)
         {
-            byte[] messageBytes = new byte[messageLength];
-            Array.Copy(packet, 4, messageBytes, 0, messageLength);
-
             try 
             {
                 STT = Encoding.UTF8.GetString(messageBytes);
                 isChangedSTT = true;
+
+                //Debug.Log("STT received: " + STT);
             }
             catch (Exception) { }
+        }
+        // PID(02) : Emotion Detection
+        else if (ID==0x02 && PID == 0x02)
+        {
+            Emotion = messageBytes[0];
+
+            //Debug.Log("Emotion received: " + Emotion);
         }
 
         //byte receivedChecksum = packet[4 + messageLength];
