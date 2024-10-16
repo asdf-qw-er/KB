@@ -6,12 +6,15 @@ public class EventTTS : MonoBehaviour
 {
     [SerializeField] private PythonManager m_PythonManager;
     [SerializeField] private bool isOnlyTTS;
+    [SerializeField] private string OnlyTTS;
 
     #region Life Cycle
     void Start()
     {
         if (!isOnlyTTS)
             gameObject.transform.GetComponent<Button>().onClick.AddListener(() => { GetTTS(gameObject.transform.GetChild(0).GetComponent<Text>().text.Replace(" ", "")); });
+        else
+            GetTTS(OnlyTTS);
     }
     #endregion
 
