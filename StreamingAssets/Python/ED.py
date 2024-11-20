@@ -94,3 +94,5 @@ while True:
 # 웹캠 종료
 video_capture.release()
 cv2.destroyAllWindows()
+
+client_socket.close()
