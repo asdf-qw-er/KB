@@ -29,7 +29,7 @@ def calculate_checksum(data):
     return checksum & 0xFF 
 
 def send_emotion_data(emotion_index):
-    packet = [255, 2, 2, 1, emotion_index]
+    packet = [255, 2, 2, 1, emotion_index + 1]
     checksum = calculate_checksum(packet)
     packet.append(checksum)
 

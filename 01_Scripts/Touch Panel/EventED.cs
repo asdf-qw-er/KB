@@ -5,6 +5,8 @@ public class EventED : MonoBehaviour
     [SerializeField] private Server m_Server;
     [SerializeField] private GameObject m_Popup;
 
+    public const int LIMIT = 3;
+
     public bool isPopupActivated;
     public float m_Time = 0f;
 
@@ -21,10 +23,10 @@ public class EventED : MonoBehaviour
     private void GetNegativeEmotion()
     {
         if (!isPopupActivated &&
-            (m_Server.Emotion == 0x00 || m_Server.Emotion == 0x01 || m_Server.Emotion == 0x02 || m_Server.Emotion == 0x04))
+            (m_Server.Emotion == 0x01 || m_Server.Emotion == 0x02 || m_Server.Emotion == 0x04 || m_Server.Emotion == 0x05))
         {
             m_Time += Time.deltaTime;
-            if (m_Time >= 60)
+            if (m_Time >= LIMIT)
             {
                 if (!m_Popup.activeSelf)
                 {
@@ -34,13 +36,13 @@ public class EventED : MonoBehaviour
             }
         }
         else
-            m_Time = 0;
+            m_Time = 0f;
     }
 
     private void _OnEnable()
     {
         isPopupActivated = false;
-        m_Time = 0;
+        m_Time = 0f;
 
         m_Popup.SetActive(false);
     }

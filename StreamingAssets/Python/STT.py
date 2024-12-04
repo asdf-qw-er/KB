@@ -1,20 +1,37 @@
 import socket
+import speech_recognition as sr
 import threading
-
-import whisper
-import pyaudio
-import numpy as np
-import librosa
-from pydub import AudioSegment, effects
-import noisereduce as nr
-
-model = whisper.load_model("medium")
 
 def calculate_checksum(data):
     checksum = 0
     for byte in data:
         checksum ^= byte
     return checksum
+
+def recognize_speech_from_mic(recognizer, microphone):
+    response = {
+        "success": False,
+        "error": None,
+        "transcription": None
+    }
+
+    with microphone as source:
+        print("Listening...")
+        try:
+            audio = recognizer.listen(source, timeout=1, phrase_time_limit=3)
+        except sr.WaitTimeoutError:
+            print("Timeout: No speech detected within the time limit.")
+            return response
+
+    try:
+        response["transcription"] = recognizer.recognize_google(audio, language="ko-KR")
+        response["success"] = True
+    except sr.RequestError:
+        response["error"] = "API unavailable"
+    except sr.UnknownValueError:
+        response["error"] = "Unable to recognize speech"
+
+    return response
 
 def send_to_unity(message, client_socket):
     try:
@@ -32,69 +49,31 @@ def send_to_unity(message, client_socket):
     except Exception as e:
         print(f"Failed to send message: {e}")
 
-def reduce_noise(audio_data):
-    audio_array, sr = librosa.load(librosa.util.buf_to_float(audio_data, n_bytes=2), sr=16000)
-    reduced_noise_audio = nr.reduce_noise(y=audio_array, sr=sr)
-    return reduced_noise_audio, sr
-
-def preprocess_audio(audio_data):
-    audio_segment = AudioSegment(
-        data=audio_data,
-        sample_width=2,
-        frame_rate=16000,
-        channels=1
-    )
-    audio_segment = effects.normalize(audio_segment)
-    return audio_segment
-
-def record_voice(duration=5, rate=16000, chunk=1024):
-    p = pyaudio.PyAudio()
-    stream = p.open(format=pyaudio.paInt16, channels=1, rate=rate, input=True, frames_per_buffer=chunk)
-    frames = []
-
-    print("Listening..")
-    for _ in range(0, int(rate / chunk * duration)):
-        data = stream.read(chunk)
-        frames.append(np.frombuffer(data, dtype=np.int16))
-
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-
-    audio_data = np.hstack(frames).astype(np.float32) / 32768.0
-    return audio_data
-
-def recognize_speech_with_whisper(audio_data):
-    try:
-        result = model.transcribe(audio_data, fp16=False, language="ko")
-        return {
-            "success": True,
-            "error": None,
-            "transcription": result["text"].strip()
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "transcription": None
-        }
-
-def voice_recognition(client_socket):
+def process_speech(client_socket, recognizer, microphone):
     while True:
-        audio_data = record_voice()
-        response = recognize_speech_with_whisper(audio_data)
+        response = recognize_speech_from_mic(recognizer, microphone)
 
         if response["success"]:
-            print(f"Result: {response['transcription']}")
+            print(f"You said: {response['transcription']}")
             send_to_unity(response['transcription'], client_socket)
         else:
+            print("I didn't catch that. What did you say?")
+
+        if response["error"]:
             print(f"ERROR: {response['error']}")
 
 def main():
+    recognizer = sr.Recognizer()
+    microphone = sr.Microphone()
+
+    with microphone as source:
+        recognizer.adjust_for_ambient_noise(source)
+        print("Calibration completed. Starting STT loop.")
+
     server_ip = '127.0.0.1'
     port = 5555
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client_socket.connect((server_ip, port))
         print(f"Connected to Unity server at {server_ip}:{port}")
@@ -102,11 +81,8 @@ def main():
         print(f"Failed to connect to Unity server: {e}")
         return
 
-    while True:
-        voice_recognition(client_socket)
-
-    # voice_recognition_thread = threading.Thread(target=voice_recognition, args=(client_socket,))
-    # voice_recognition_thread.start()
+    speech_thread = threading.Thread(target=process_speech, args=(client_socket, recognizer, microphone))
+    speech_thread.start()
 
 if __name__ == "__main__":
     main()
